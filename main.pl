@@ -1,5 +1,18 @@
 :- use_module(library(clpfd)).
 
+/*
+Restrictions:
+    * Red -> 1 Yellow.
+	* Each way of yellow -> Yellow-Green-Blue-Red.
+	
+Cube faces:
+	   [3]
+	[5][1][2][6]
+	   [4]
+*/
+
+
+
 cube[Face1, Face2, Face3, Face4, Face5, Face6].
 
 emptyTile[Cabeca|Cauda]:-
@@ -19,7 +32,7 @@ createCube(Size):-
 	emptyTile(Face4),
 	emptyTile(Face5),
 	emptyTile(Face6).
-
-/*cube is an array with size 6 */
-
+	
+generateSolution(Size):-
+	createCube(Size),
 
