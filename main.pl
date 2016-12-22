@@ -53,7 +53,10 @@ createCube(Cube, CubeSize):-
 	length(Face5, NumberTiles),
 	length(Face6, NumberTiles),
 	buildCube(Cube, CubeSize, NumberTiles, 1),
-	%TODO restrictions -> copy nice try but with restrictions
+	constrain(Cube, Cube, CubeSize),
+	
+	%flatten?
+	%labeling?
 	
 	
 
@@ -79,8 +82,120 @@ buildFace([Tile | Rest], FaceNum, CubeSize, Iterator):-
 	%Go to next iteration
 	Iteratorplus is Iterator + 1,
 	buildFace(Rest, FaceNum, Iteratorplus).
+
 	
 
-generateSolution(Size):-
-	createCube(Size).
+%-------------------------------  CONSTRAINS  --------------------------------
+%Apply constrains to the cube
+constrain([], _, _).
+constrain([Face | Rest], Cube, CubeSize):-
+	constrainFace([Face | Rest], Cube, CubeSize),
+	constrain(Rest, Cube, CubeSize).
+	
+%Apply constrains to a face
+constrainFace([], _, _).
+constrainFace([[FaceNum, [X, Y], Color] | Rest], Cube, CubeSize):-
+	obtainNextTo([FaceNum, [X, Y], Color], List, Cube, CubeSize),
+	%Pick each adjacent tile color from the list
+	element(1, List, [_, [_, _], Color1]),
+	element(2, List, [_, [_, _], Color2]),
+	element(3, List, [_, [_, _], Color3]),
+	element(4, List, [_, [_, _], Color4]),
+	
+	%DUVIDA Ele vai perceber que dos valores das Color1,2,3 e 4, so um deles é que pode ter a Restricted Color?
+	%Restrict that next color appears 1 time in List, and the other is free
+	ColorList = [Color1, Color2, Color3, Color4],
+	RestrictedColor is (Color mod 4) + 2, %Color + 1, and if is 4, then RestrictedColor is 1
+	OtherColor1 is (Color mod 4) + 3,
+	OtherColor2 is (Color mod 4),
+	OtherColor3 is (Color mod 4) + 1,
+	global_cardinality(ColorList, [RestrictedColor-1, OtherColor1-_, OtherColor2-_, OtherColor3-_]),
+	
+	%Recursive Step
+	constrainFace(Rest, Cube, CubeSize).
+	
+	
+	
+%colorConstrict([_Face, [X1, Y1], Color1], [_Face, [X2, Y2], Color2], _CubeSize):-
+
+
+
+%---------------------------- FACE ADJACENCE DEFINITION -------------------------
+	
+%For now only works with 3 x 3
+%TODO change the 1st number in element to a variable
+
+%Face 1
+%Up Left Corner
+obtainNextTo([1, [1, 1], _Color], List, Cube, CubeSize):-
+	element(3, Cube, Face3), %Up Tile
+	element(7, Face3, UpNext),
+	element(1, Cube, Face1), %Right and Down tiles
+	element(2, Face1, RightNext),
+	element(4, Face1, DownNext),
+	element(5, Cube, Face5), %Left Tile
+	element(3, Face5, LeftNext),
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+%Up Right Corner
+obtainNextTo([1, [CubeSize, 1], _Color], List, Cube, CubeSize):-
+	element(3, Cube, Face3), %Up Tile
+	element(9, Face3, UpNext),
+	element(2, Cube, Face2),%Right Tile
+	element(1, Face2, RightNext),
+	element(1, Cube, Face1), %Down and Left Tiles
+	element(6, Face1, DownNext),
+	element(2, Face1, LeftNext),
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+%Down Left Corner
+obtainNextTo([1, [1, CubeSize], _Color], List, Cube, CubeSize):-
+	element(1, Cube, Face1), %Up and Right tiles
+	element(4, Face1, UpNext),
+	element(8, Face1, RightNext),
+	element(4, Cube, Face4), %Down tile
+	element(1, Face4, DownNext),
+	element(5, Cube, Face5), %Left tile
+	element(9, Face5, LeftNext).
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+%Down Right Corner
+obtainNextTo([1, [CubeSize, CubeSize], _Color], List, Cube, CubeSize):-
+	element(1, Cube, Face1),
+	element(6, Face1, UpNext),
+	element(8, Face1, LeftNext),
+	element(2, Cube, Face2),
+	element(7, Face2, RightNext),
+	element(4, Cube, Face4),
+	element(3, Face4, DownNext),
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+%Up Border
+obtainNextTo([1, [X, 1], _Color, List, Cube, CubeSize):-
+	element(3, Cube, Face3),
+	UpElemNum is (CubeSize * (CubeSize - 1)) + X,
+	element(UpElemNum, Face3, UpNext),
+	element(1, Cube, Face1),
+	RightElemNum is X +1,
+	DownElemNum is X+CubeSize,
+	LeftElemNum is X - 1,
+	element(RightElemNum, Face1, RightNext),
+	element(DownElemNum, Face1, DownNext),
+	element(LeftElemNum, Face1, LeftNext),
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+%Right Border
+obtainNextTo([1, [CubeSize, Y], _Color], List, Cube, CubeSize):-
+	element(5, Cube, Face5),
+	RightElemNum = (CubeSize * (Y - 1)) + 1,
+	element(RightElemNum, Face5, RightNext),
+	element(1, Cube, Face1),
+	UpElemNum is Y
+	%TODO resto
+	
+
+%Notes: Check global_cardinality
+%		Color + 1 mod 4 to obtain the next colors
+/*generateSolution(Size):-
+	createCube(Size).*/
 
