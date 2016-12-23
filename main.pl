@@ -1055,10 +1055,6 @@ buildFace2([Tile | Rest], FaceNum, Iterator, CubeSize, TotalTiles):-
 	buildFace2(Rest, FaceNum, Iteratorplus, CubeSize, TotalTiles).
 	
 %buildCube3 - Builds a flat cube
-buildCube3(Cube, 6, 3, 1, CubeSize):- %Next face
-	append([Color],TileTemp, Cube),
-	%Color #= 1,
-	buildCube3(TileTemp, 6, 1, 2, CubeSize).
 buildCube3(Cube, 6, CubeSize, CubeSize, CubeSize):-
 	append([Color], [], Cube).
 buildCube3(Cube, FaceNum, CubeSize, CubeSize, CubeSize):- %Next face
