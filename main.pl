@@ -139,10 +139,10 @@ constrain2(Cube, FaceNum, [CubeSize, CubeSize], CubeSize):-
 	count(2, List, #=, AdjacentYellow),
 	count(3, List, #=, AdjacentGreen),
 	count(4, List, #=, AdjacentBlue),
-	ActualTileColor #= 1 #=> AdjacentRed #= 1,
-	ActualTileColor #= 2 #=> AdjacentYellow #= 1,
-	ActualTileColor #= 3 #=> AdjacentGreen #= 1,
-	ActualTileColor #= 4 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 1 #=> AdjacentYellow #= 1,
+	ActualTileColor #= 2 #=> AdjacentGreen #= 1,
+	ActualTileColor #= 3 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 4 #=> AdjacentRed #= 1,
 	
 	%Next Tile
 	Faceplus is FaceNum + 1,
@@ -164,10 +164,10 @@ constrain2(Cube, FaceNum, [CubeSize, Y], CubeSize):-
 	count(2, List, #=, AdjacentYellow),
 	count(3, List, #=, AdjacentGreen),
 	count(4, List, #=, AdjacentBlue),
-	ActualTileColor #= 1 #=> AdjacentRed #= 1,
-	ActualTileColor #= 2 #=> AdjacentYellow #= 1,
-	ActualTileColor #= 3 #=> AdjacentGreen #= 1,
-	ActualTileColor #= 4 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 1 #=> AdjacentYellow #= 1,
+	ActualTileColor #= 2 #=> AdjacentGreen #= 1,
+	ActualTileColor #= 3 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 4 #=> AdjacentRed #= 1,
 	
 	%Next Tile
 	Yplus is Y + 1,
@@ -197,10 +197,10 @@ constrain2(Cube, FaceNum, [X, Y], CubeSize):-
 	count(2, List, #=, AdjacentYellow),
 	count(3, List, #=, AdjacentGreen),
 	count(4, List, #=, AdjacentBlue),
-	ActualTileColor #= 1 #=> AdjacentRed #= 1,
-	ActualTileColor #= 2 #=> AdjacentYellow #= 1,
-	ActualTileColor #= 3 #=> AdjacentGreen #= 1,
-	ActualTileColor #= 4 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 1 #=> AdjacentYellow #= 1,
+	ActualTileColor #= 2 #=> AdjacentGreen #= 1,
+	ActualTileColor #= 3 #=> AdjacentBlue #= 1,
+	ActualTileColor #= 4 #=> AdjacentRed #= 1,
 	
 	%Next Tile
 	Xplus is X + 1,
