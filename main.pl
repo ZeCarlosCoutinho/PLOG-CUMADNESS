@@ -1,6 +1,14 @@
 :- use_module(library(clpfd)).
 :- use_module(library(lists)).
 
+
+reset_timer :- statistics(walltime,_).
+
+print_time :-
+	statistics(walltime,[_,T]),
+	TS is ((T//10)*10)/1000,
+	nl, write('Time: '), write(TS), write('s'), nl, nl.
+
 %-------------------------------  CUBE BUILDING  --------------------------------
 %Builds a flat cube
 %End of Cube
@@ -903,6 +911,14 @@ obtainNextTo([FaceNum, [X, Y], _Color], List, Cube, CubeSize):-
 
 
 %-------------------------------  CUBE DISPLAY  --------------------------------
+writeTileColor(1):-
+	write('R').
+writeTileColor(2):-
+	write('Y').
+writeTileColor(3):-
+	write('G').
+writeTileColor(4):-
+	write('B').	
 
 writeCube(Cube, CubeSize):-
 	writeCube(Cube, 1, [1,1], CubeSize).
@@ -912,7 +928,7 @@ writeCube(Cube, Face, [CubeSize, CubeSize], CubeSize):-
 	TotalTiles is CubeSize * CubeSize,
 	Index is TotalTiles * (Face - 1) + (CubeSize * (CubeSize - 1) + CubeSize),
 	nth1(Index, Cube, Color),
-	write(Color), write(' '),
+	writeTileColor(Color), write(' '),
 	nl, nl,
 	Faceplus is Face + 1,
 	writeCube(Cube, Faceplus, [1, 1], CubeSize).
@@ -920,7 +936,7 @@ writeCube(Cube, Face, [CubeSize, Y], CubeSize):-
 	TotalTiles is CubeSize * CubeSize,
 	Index is TotalTiles * (Face - 1) + (CubeSize * (Y - 1) + CubeSize),
 	nth1(Index, Cube, Color),
-	write(Color),
+	writeTileColor(Color),
 	write(' '),
 	nl,
 	Yplus is Y + 1,
@@ -929,7 +945,7 @@ writeCube(Cube, Face, [X, Y], CubeSize):-
 	TotalTiles is CubeSize * CubeSize,
 	Index is TotalTiles * (Face - 1) + (CubeSize * (Y - 1) + X),
 	nth1(Index, Cube, Color),
-	write(Color),
+	writeTileColor(Color),
 	write(' '),
 	Xplus is X + 1,
 	writeCube(Cube, Face, [Xplus, Y], CubeSize).
@@ -939,6 +955,7 @@ writeCube(Cube, Face, [X, Y], CubeSize):-
 %-------------------------------  CU MADNESS --------------------------------
 
 cuMadness(Cube, CubeSize):-
+	reset_timer,
 	buildCube(Cube, 1, 1, 1, CubeSize),
 	write('=========='),nl,
 	write('Finished Building Cube'), nl,
@@ -956,4 +973,5 @@ cuMadness(Cube, CubeSize):-
 	write('Finished Labeling Cube'), nl,
 	write('=========='),nl,
 	
-	writeCube(Cube, CubeSize).
+	writeCube(Cube, CubeSize),
+	print_time.
