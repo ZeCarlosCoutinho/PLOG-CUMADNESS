@@ -73,30 +73,23 @@ element2(Position, Face, [FaceNum, [X, Y], Color]):-
 
 %Face by face, builds the cube
 %Face = Actual face, Rest = Rest of the faces, CubeSize = Cube measure, NumberTiles = (Cube measure) ^2, Iterator = Face number
-buildCube([], _, _, 7).
-buildCube([], _, _, _):-
-	write("Error building cube").
+buildCube(Cube, _, _, 7).
 buildCube([Face | Rest], CubeSize, NumberTiles, Iterator):-
-	buildFace(Face, Iterator, CubeSize, 0),
 	Iteratorplus is Iterator + 1,
+	buildFace(Face, Iterator, 0, CubeSize, NumberTiles),
 	buildCube(Rest, CubeSize, NumberTiles, Iteratorplus).
 	
 %Face is filled from top to bottom, left to right
-% Face = [Tile | Rest], FaceNum = 1..6, CubeSize = Cube measure, Iterator = Tile Number
-buildFace([], _, _, _).
-buildFace([Tile | Rest], FaceNum, CubeSize, Iterator):-
+% Face = [Tile | Rest], FaceNum = 1..6, CubeSize = Cube measure, NumberTiles = (Cube measure) ^2, Iterator = Tile Number
+buildFace(_, _, NumberTiles, _, NumberTiles).
+buildFace([Tile | Rest], FaceNum, CubeSize, NumberTiles, Iterator):-
 	X is (Iterator mod CubeSize) + 1,
 	Y is floor(Iterator / CubeSize) + 1,
+	append([FaceNum], [X, Y], TileTemp),
+	append(TileTemp, [Color], Tile),
+	domain([Color], 1, 4),
 	Iteratorplus is Iterator + 1,
-	TileContent = [FaceNum, [X, Y], Cor],
-	element2(Iteratorplus, [Tile | Rest], TileContent),
-	%nth1(Iterator, [Tile | Rest], [FaceNum, [X, Y], Cor]),
-	domain(Cor, 1, 4), %There are only 4 color possible
-	
-	%Go to next iteration
-	buildFace(Rest, FaceNum, Iteratorplus).
-
-	
+	buildFace(Rest, FaceNum, CubeSize, NumberTiles, Iteratorplus).
 
 %-------------------------------  CONSTRAINS  --------------------------------
 %Apply constrains to the cube
@@ -367,118 +360,150 @@ obtainNextTo([2, [1, Y], _Color], List, Cube, CubeSize):-
 %------------------------------------------------------
 %Up Left Corner
 obtainNextTo([3, [1,1], _Color], List, Cube, CubeSize):-
-	element(6, Cube, Face6),
+	nth1(6, Cube, Face6),
 	UpElemNum = CubeSize,
-	element(5, Cube, Face5),
+	nth1(5, Cube, Face5),
 	LeftElemNum = 1,
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	RightElemNum = 2,
 	DownElemNum is CubeSize + 1,
-	element(UpElemNum, Face6, UpNext),
-	element(RightElemNum, Face3, RightNext),
-	element(DownElemNum, Face3, DownNext),
-	element(LeftElemNum, Face5, LeftNext),
+	nth1(UpElemNum, Face6, UpTile),
+	nth1(RightElemNum, Face3, RightTile),
+	nth1(DownElemNum, Face3, DownTile),
+	nth1(LeftElemNum, Face5, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Up Right Corner
 obtainNextTo([3, [CubeSize, 1], _Color], List, Cube, CubeSize):-
-	element(6, Cube, Face6),
+	nth1(6, Cube, Face6),
 	UpElemNum = 1,
-	element(2, Cube, Face2),
+	nth1(2, Cube, Face2),
 	RightElemNum = CubeSize,
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	DownElemNum is CubeSize * 2,
 	LeftElemNum is CubeSize - 1,
-	element(UpElemNum, Face6, UpNext),
-	element(RightElemNum, Face2, RightNext),
-	element(DownElemNum, Face3, DownNext),
-	element(LeftElemNum, Face3, LeftNext),
+	nth1(UpElemNum, Face6, UpTile),
+	nth1(RightElemNum, Face2, RightTile),
+	nth1(DownElemNum, Face3, DownTile),
+	nth1(LeftElemNum, Face3, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Down Left Corner
 obtainNextTo([3, [1, CubeSize], _Color], List, Cube, CubeSize):-
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	UpElemNum is (CubeSize * (CubeSize - 2)) + 1,
 	RightElemNum is (CubeSize * (CubeSize - 1)) + 2,
-	element(1, Cube, Face1),
+	nth1(1, Cube, Face1),
 	DownElemNum = 1,
-	element(5, Cube, Face5),
+	nth1(5, Cube, Face5),
 	LeftElemNum = CubeSize,
-	element(UpElemNum, Face3, UpNext),
-	element(RightElemNum, Face3, RightNext),
-	element(DownElemNum, Face1, DownNext),
-	element(LeftElemNum, Face5, LeftNext),
+	nth1(UpElemNum, Face3, UpTile),
+	nth1(RightElemNum, Face3, RightTile),
+	nth1(DownElemNum, Face1, DownTile),
+	nth1(LeftElemNum, Face5, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Down Right Corner
 obtainNextTo([3, [CubeSize, CubeSize], _Color], List, Cube, CubeSize):-
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	UpElemNum is CubeSize * (CubeSize - 1),
 	LeftElemNum is (CubeSize * CubeSize) - 1,
-	element(2, Cube, Face2),
+	nth1(2, Cube, Face2),
 	RightElemNum = 1,
-	element(1, Cube, Face1),
+	nth1(1, Cube, Face1),
 	DownElemNum = CubeSize,
-	element(UpElemNum, Face3, UpNext),
-	element(RightElemNum, Face2, RightNext),
-	element(DownElemNum, Face1, DownNext),
-	element(LeftElemNum, Face3, LeftNext),
+	nth1(UpElemNum, Face3, UpTile),
+	nth1(RightElemNum, Face2, RightTile),
+	nth1(DownElemNum, Face1, DownTile),
+	nth1(LeftElemNum, Face3, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Up Border
 obtainNextTo([3, [X, 1], _Color], List, Cube,CubeSize):-
-	element(6, Cube, Face6),
-	XFace6 is CubeSize - (X - 1),
-	element(UpElemNum, Face6, [_, [XFace6, 1], UpNext]), %TODO sera que tem de se fazer outro element depois deste com element(UpElemNum, Face3, UpNext)?
-	element(3, Cube, Face3),
+	nth1(6, Cube, Face6),
+	UpElemNum is CubeSize - (X - 1),
+	nth1(3, Cube, Face3),
 	RightElemNum is X + 1,
 	DownElemNum is CubeSize + X,
 	LeftElemNum is X - 1,
-	element(RightElemNum, Face3, RightNext),
-	element(DownElemNum, Face3, DownNext),
-	element(LeftElemNum, Face3, LeftNext),
+	nth1(UpElemNum, Face6, UpTile),
+	nth1(RightElemNum, Face3, RightTile),
+	nth1(DownElemNum, Face3, DownTile),
+	nth1(LeftElemNum, Face3, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Right Border
 obtainNextTo([3, [CubeSize, Y], _Color], List, Cube, CubeSize):-
-	element(2, Cube, Face2),
+	nth1(2, Cube, Face2),
 	RightElemNum is CubeSize - (Y - 1),
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	UpElemNum is CubeSize*(Y - 1),
 	DownElemNum is CubeSize * (Y + 1),
 	LeftElemNum is (CubeSize * Y) - 1,
-	element(UpElemNum, Face3, UpNext),
-	element(RightElemNum, Face2, RightNext),
-	element(DownElemNum, Face3, DownNext),
-	element(LeftElemNum, Face3, LeftNext),
+	nth1(UpElemNum, Face3, UpTile),
+	nth1(RightElemNum, Face2, RightTile),
+	nth1(DownElemNum, Face3, DownTile),
+	nth1(LeftElemNum, Face3, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Down Border
 obtainNextTo([3, [X, CubeSize], _Color], List, Cube, CubeSize):-
-	element(1, Cube, Face1),
+	nth1(1, Cube, Face1),
 	DownElemNum = X,
-	element(DownElemNum, Face1, DownNext),
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	UpElemNum is (CubeSize * (CubeSize - 2)) + X,
 	RightElemNum is (CubeSize * (CubeSize - 1)) + X + 1,
 	LeftElemNum is (CubeSize * (CubeSize - 1)) + X - 1,
-	element(UpElemNum, Face3, UpNext),
-	element(RightElemNum, Face3, RightNext),
-	element(LeftElemNum, Face3, LeftNext),
+	nth1(UpElemNum, Face3, UpTile),
+	nth1(RightElemNum, Face3, RightTile),
+	nth1(DownElemNum, Face1, DownTile),
+	nth1(LeftElemNum, Face3, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Left Border
 obtainNextTo([3, [1, Y], _Color], List, Cube, CubeSize):-
-	element(5, Cube, Face5),
+	nth1(5, Cube, Face5),
 	LeftElemNum = Y,
-	element(LeftElemNum, Face5, LeftNext),
-	element(3, Cube, Face3),
+	nth1(3, Cube, Face3),
 	UpElemNum is (CubeSize * (Y - 1)) - (CubeSize - 1),
 	RightElemNum is (CubeSize * Y) - (CubeSize - 2),
 	DownElemNum is (CubeSize * (Y + 1)) - (CubeSize - 1),
-	element(UpElemNum, Face3, UpNext),
-	element(RightElemNum, Face3, RightNext),
-	element(DownElemNum, Face3, DownNext),
+	nth1(UpElemNum, Face3, UpTile),
+	nth1(RightElemNum, Face3, RightTile),
+	nth1(DownElemNum, Face3, DownTile),
+	nth1(LeftElemNum, Face5, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 	
@@ -487,32 +512,40 @@ obtainNextTo([3, [1, Y], _Color], List, Cube, CubeSize):-
 %------------------------------------------------------
 %Up Left Corner
 obtainNextTo([4, [1,1], _Color], List, Cube, CubeSize):-
-	element(1, Cube, Face1),
+	nth1(1, Cube, Face1),
 	UpElemNum is (CubeSize * (CubeSize -1)) + 1,
-	element(5, Cube, Face5),
+	nth1(5, Cube, Face5),
 	LeftElemNum is CubeSize * CubeSize,
-	element(4, Cube, Face4),
+	nth1(4, Cube, Face4),
 	RightElemNum = 2,
 	DownElemNum is CubeSize + 1,
-	element(UpElemNum, Face1, UpNext),
-	element(RightElemNum, Face4, RightNext),
-	element(DownElemNum, Face4, DownNext),
-	element(LeftElemNum, Face5, LeftNext),
+	nth1(UpElemNum, Face1, UpTile),
+	nth1(RightElemNum, Face4, RightTile),
+	nth1(DownElemNum, Face4, DownTile),
+	nth1(LeftElemNum, Face5, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Up Right Corner
 obtainNextTo([4, [CubeSize, 1], _Color], List, Cube, CubeSize):-
-	element(1, Cube, Face1),
+	nth1(1, Cube, Face1),
 	UpElemNum is CubeSize * CubeSize,
-	element(2, Cube, Face2),
+	nth1(2, Cube, Face2),
 	RightElemNum is (CubeSize *(CubeSize - 1)) + 1,
-	element(4, Cube, Face4),
+	nth1(4, Cube, Face4),
 	DownElemNum is CubeSize * 2,
 	LeftElemNum is CubeSize - 1,
-	element(UpElemNum, Face1, UpNext),
-	element(RightElemNum, Face2, RightNext),
-	element(DownElemNum, Face4, DownNext),
-	element(LeftElemNum, Face4, LeftNext),
+	nth1(UpElemNum, Face1, UpTile),
+	nth1(RightElemNum, Face2, RightTile),
+	nth1(DownElemNum, Face4, DownTile),
+	nth1(LeftElemNum, Face4, LeftTile),
+	element(4, UpTile, UpNext),
+	element(4, RightTile, RightNext),
+	element(4, DownTile, DownNext),
+	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
 %Down Left Corner
@@ -864,21 +897,29 @@ obtainNextTo([FaceNum, [X, Y], _Color], List, Cube, CubeSize):-
 	createCube(Size).*/
 
 test(FaceNum, X, Y, List, CubeSize):-
-	NumberTiles is CubeSize * CubeSize,
-	buildCube2(Cube, CubeSize, NumberTiles, 1),
-	obtainNextTo2([FaceNum, [X, Y], _], List, Cube, CubeSize),
+	%NumberTiles is CubeSize * CubeSize,
+	buildCube3(Cube, 1, 1, 1, CubeSize),
+	obtainNextTo3([FaceNum, [X, Y], _], List, Cube, CubeSize),
 	global_cardinality(List, [1-2, 2-1, 3-1, 4-_]),
 	labeling([], List).
 	
 	
-buildCube2(Cube, _, _, 7):-
-	writeCube(Cube).
+buildCube2(Cube, _, _, 7).
 buildCube2([Face | Rest], CubeSize, TotalTiles, Iterator):-
 	Iteratorplus is Iterator + 1,
 	buildFace2(Face, Iterator, 0, CubeSize, TotalTiles),
 	buildCube2(Rest, CubeSize, TotalTiles, Iteratorplus).
 	
 buildFace2(_, _, TotalTiles, _, TotalTiles):- nl.
+buildFace2([Tile | Rest], 6, 3, CubeSize, TotalTiles):- %Just for testing. Color #= 1 not being applied in the end
+	X is (3 mod CubeSize) + 1,
+	Y is floor(3 / CubeSize) + 1,
+	append([6], [X, Y], TileTemp),
+	append(TileTemp, [Color], Tile),
+	domain([Color], 1, 4),
+	Color #= 1,
+	Iteratorplus is 3 + 1,
+	buildFace2(Rest, FaceNum, Iteratorplus, CubeSize, TotalTiles).
 buildFace2([Tile | Rest], FaceNum, Iterator, CubeSize, TotalTiles):-
 	X is (Iterator mod CubeSize) + 1,
 	Y is floor(Iterator / CubeSize) + 1,
@@ -888,6 +929,26 @@ buildFace2([Tile | Rest], FaceNum, Iterator, CubeSize, TotalTiles):-
 	Iteratorplus is Iterator + 1,
 	buildFace2(Rest, FaceNum, Iteratorplus, CubeSize, TotalTiles).
 	
+%buildCube3 - Builds a flat cube
+buildCube3(_, 7, _, _, _).
+buildCube3(Cube, FaceNum, CubeSize, CubeSize, CubeSize):- %Next face
+	append([FaceNum, CubeSize, CubeSize, Color],TileTemp, Cube),
+	Color #> 0, Color #< 5,
+	Faceplus is FaceNum + 1,
+	buildCube3(TileTemp, Faceplus, 1, 1, CubeSize).
+buildCube3(Cube, FaceNum, CubeSize, Y, CubeSize):- %Next Line
+	append([FaceNum, CubeSize, Y, Color],TileTemp, Cube),
+	Color #> 0, Color #< 5,
+	Yplus is Y + 1,
+	buildCube3(TileTemp, FaceNum, 1, Yplus, CubeSize).
+buildCube3(Cube, FaceNum, X, Y, CubeSize):- %Next tile in line
+	append([FaceNum, X, Y, Color],TileTemp, Cube),
+	Color #> 0, Color #< 5,
+	Xplus is X + 1,
+	buildCube3(TileTemp, FaceNum, Xplus, Y, CubeSize).
+
+
+
 writeCube([]):- nl.
 writeCube([Face|Rest]):-
 	writeFace(Face),
@@ -917,3 +978,41 @@ obtainNextTo2([3, [1,1], _Color], List, Cube, CubeSize):-
 	element(4, LeftTile, LeftNext),
 	
 	List = [UpNext, RightNext, DownNext, LeftNext].
+	
+%Up Left Corner
+obtainNextTo3([3, [1,1], _Color], List, Cube, CubeSize):-
+	TilesPerFace is CubeSize * CubeSize,
+	Face6 is (4 * TilesPerFace * 5), %1 before First Element of Face 6
+	UpElemNum is Face6 + (4 * CubeSize),
+	Face5 is (4 * TilesPerFace * 4),
+	LeftElemNum is Face5 + 4,
+	Face3 is (4 * TilesPerFace  * 2),
+	RightElemNum is Face3 + (4 * 2),
+	DownElemNum is Face3 + (4 * (CubeSize + 1)),
+	
+	A is UpElemNum - 3,
+	B is UpElemNum - 2,
+	C is UpElemNum - 1,
+	nth1(A, Cube, Oi),
+	nth1(B, Cube, Oi2),
+	nth1(C, Cube, Oi3),
+	nth1(UpElemNum, Cube, Oi4),
+	write(Oi),
+	write(Oi2),
+	write(Oi3),
+	write(Oi4),
+	
+	element(UpElemNum, Cube, UpNext),
+	element(RightElemNum, Cube, RightNext),
+	element(DownElemNum, Cube, DownNext),
+	element(LeftElemNum, Cube, LeftNext),
+	
+	List = [UpNext, RightNext, DownNext, LeftNext].
+	
+flatten2([], []) :- !.
+flatten2([L|Ls], FlatL) :-
+    !,
+    flatten2(L, NewL),
+    flatten2(Ls, NewLs),
+    append(NewL, NewLs, FlatL).
+flatten2(L, [L]).
